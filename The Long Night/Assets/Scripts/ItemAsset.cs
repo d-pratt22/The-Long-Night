@@ -5,6 +5,12 @@ using UnityEngine;
 public class ItemAsset : ScriptableObject
 {
     public string itemName;
-    public GameObject itemPrefab;
+    public Sprite itemSprite;
     [TextArea] public string itemText;
+    public ItemType itemType;
+
+    public enum ItemType
+    {
+        Weapon
+    }
 }
