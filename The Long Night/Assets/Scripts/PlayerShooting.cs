@@ -1,4 +1,6 @@
+using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerShooting : MonoBehaviour
@@ -8,9 +10,17 @@ public class PlayerShooting : MonoBehaviour
     private bool canShoot = true;
     private int bulletCount = 0;
 
+    public Transform weaponHolder;
+    public List<WeaponVisual> weaponVisuals = new List<WeaponVisual>();
+
     private void Start()
     {
         camScript = Camera.main.GetComponent<FixedCamera>();
+
+        foreach (var visual in weaponVisuals)
+        {
+            visual.weaponObject.SetActive(false);
+        }
     }
 
     public void EquipWeapon(WeaponItem newWeapon)
@@ -20,6 +30,22 @@ public class PlayerShooting : MonoBehaviour
         if(equippedWeapon != null)
         {
             bulletCount = equippedWeapon.bulletCount;
+        }
+
+        foreach (var visual in weaponVisuals)
+        {
+            visual.weaponObject.SetActive(false);
+        }
+
+        WeaponVisual match = weaponVisuals.Find(v => v.weaponData == newWeapon);
+        if (match != null)
+        {
+            match.weaponObject.SetActive(true);
+            bulletCount = newWeapon.bulletCount;
+        }
+        else
+        {
+            Debug.LogWarning($"No visual found for {newWeapon.name}");
         }
     }
 
@@ -36,37 +62,46 @@ public class PlayerShooting : MonoBehaviour
         }
     }
 
-    void Shoot()
+    private void Shoot()
     {
-
-        if (equippedWeapon == null)
-        {
-            Debug.LogWarning("No weapon equipped!");
+        if (equippedWeapon == null || !canShoot || bulletCount <= 0)
             return;
-        }
+
+        bulletCount--;
 
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        WeaponVisual currentVisual = weaponVisuals.Find(v =>
+            v.weaponData == equippedWeapon && v.weaponObject.activeSelf);
 
-        if(canShoot && bulletCount > 0)
+        Transform muzzle = (currentVisual != null && currentVisual.muzzlePoint != null)
+            ? currentVisual.muzzlePoint
+            : transform;
+
+
+        Plane plane = new Plane(Vector3.up, muzzle.position);
+        Ray camRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (plane.Raycast(camRay, out float enter))
         {
-            bulletCount--;
-            
-            if (Physics.Raycast(ray, out RaycastHit hit, 100))
-            {
-                Debug.DrawLine(ray.origin, hit.point, Color.red, 2f);
-                Debug.Log($"Hit object: {hit.collider.name}");
+            Vector3 targetPoint = camRay.GetPoint(enter);
+            Vector3 direction = (targetPoint - muzzle.position).normalized;
 
-                EnemyHealth enemy = hit.collider.GetComponent<EnemyHealth>();
+
+            if (Physics.Raycast(muzzle.position, direction, out RaycastHit hit, 100f, ~0, QueryTriggerInteraction.Collide))
+            {
+                Debug.DrawLine(muzzle.position, hit.point, Color.red, 2f);
+                Debug.Log($"Hit: {hit.collider.name}");
+
+                EnemyHealth enemy = hit.collider.GetComponentInParent<EnemyHealth>();
                 if (enemy != null)
                 {
                     enemy.TakeDamage(equippedWeapon.baseDamage, hit.point);
                 }
             }
-
-            StartCoroutine(AttackSpeed());
         }
+
+        StartCoroutine(AttackSpeed());
     }
+
 
     IEnumerator AttackSpeed()
     {
@@ -80,4 +115,12 @@ public class PlayerShooting : MonoBehaviour
         yield return new WaitForSeconds(equippedWeapon.reloadSpeed);
         bulletCount = equippedWeapon.bulletCount;
     }
+}
+
+[System.Serializable]
+public class WeaponVisual
+{
+    public WeaponItem weaponData;
+    public GameObject weaponObject;
+    public Transform muzzlePoint;
 }

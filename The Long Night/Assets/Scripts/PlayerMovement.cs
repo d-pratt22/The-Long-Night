@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;
     private Vector3 movementInput;
     private FixedCamera camScript;
+    private bool hasMovementInput;
 
     void Start()
     {
@@ -32,6 +33,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (inputDirection.magnitude >= 0.1f)
         {
+            hasMovementInput = true;
+
             // Camera-relative movement
             Vector3 camForward = cameraTransform.forward;
             Vector3 camRight = cameraTransform.right;
@@ -45,31 +48,51 @@ public class PlayerMovement : MonoBehaviour
 
         else
         {
+            hasMovementInput= false;
+
             movementInput = Vector3.zero; 
         }
     }
 
     private void HandleRotation()
     {
+        bool isAiming = camScript != null && camScript.isAiming;
 
-        if (movementInput == Vector3.zero) return; 
-
-
-        if (camScript != null && camScript.isAiming)
+        if (isAiming)
         {
-            /*// Face same direction as camera
-            Vector3 camForward = cameraTransform.forward;
-            if (camForward != Vector3.zero)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(camForward);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 15f * Time.deltaTime);
-            }*/
+            RotateTowardCursor();
+            return;
         }
-        else
+
+        if (movementInput.magnitude < 0.01f)
         {
-            // Rotate toward movement direction
-            Quaternion targetRotation = Quaternion.LookRotation(movementInput);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
+            movementInput = Vector3.zero;
+            return; 
+        }
+
+        if (!hasMovementInput) return;
+
+         Quaternion targetRotation = Quaternion.LookRotation(movementInput);
+         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
+        
+    }
+
+    private void RotateTowardCursor()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane groundPlane = new Plane(Vector3.up, transform.position);
+
+        if (groundPlane.Raycast(ray, out float enter))
+        {
+            Vector3 hitPoint = ray.GetPoint(enter);
+            Vector3 lookDir = hitPoint - transform.position;
+            lookDir.y = 0f; // keep rotation flat
+
+            if (lookDir.sqrMagnitude > 0.01f)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(lookDir);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, 15f * Time.deltaTime);
+            }
         }
     }
 
