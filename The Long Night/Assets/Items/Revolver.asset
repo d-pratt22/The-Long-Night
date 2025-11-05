@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1a6bf6b6965c0041801ea51653e424e, type: 3}
   m_Name: Revolver
   m_EditorClassIdentifier: 
-  itemName: 
-  itemSprite: {fileID: 0}
-  itemText: 
+  itemName: Revolver
+  itemSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  itemText: Trusty Revolver
   itemType: 0
-  baseDamage: 0
-  attackSpeed: 0
-  reloadSpeed: 0
-  bulletCount: 0
+  baseDamage: 10
+  attackSpeed: 2
+  reloadSpeed: 6
+  bulletCount: 6

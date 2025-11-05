@@ -3,6 +3,17 @@ using UnityEngine;
 public class InventoryItemController : MonoBehaviour
 {
     public ItemAsset item;
+    public PlayerShooting playerShooting;
+
+    private void Awake()
+    {
+        if (playerShooting == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+                playerShooting = player.GetComponent<PlayerShooting>();
+        }
+    }
 
     public void RemoveItem()
     {
@@ -28,8 +39,13 @@ public class InventoryItemController : MonoBehaviour
         //Maybe: RemoveItem();
     }
 
-    public void EquipWeapon()
+    private void EquipWeapon()
     {
         Debug.Log("Weapon Equipped");
+
+        if (item is WeaponItem weapon)
+        {
+            playerShooting.EquipWeapon(weapon);
+        }
     }
 }

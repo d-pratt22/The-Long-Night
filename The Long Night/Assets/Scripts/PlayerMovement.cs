@@ -7,8 +7,6 @@ public class PlayerMovement : MonoBehaviour
     public float aimMoveSpeed = 1f;
     public Transform cameraTransform;
 
-    public int damage = 10;
-
     private Rigidbody rb;
     private Vector3 movementInput;
     private FixedCamera camScript;
@@ -20,6 +18,12 @@ public class PlayerMovement : MonoBehaviour
     }
 
     void Update()
+    {
+        HandleMovementInput();
+        HandleRotation();
+    }
+
+    private void HandleMovementInput()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
@@ -37,68 +41,42 @@ public class PlayerMovement : MonoBehaviour
             camRight.Normalize();
 
             movementInput = camForward * inputDirection.z + camRight * inputDirection.x;
+        }
 
-            if (camScript != null && camScript.isAiming)
+        else
+        {
+            movementInput = Vector3.zero; 
+        }
+    }
+
+    private void HandleRotation()
+    {
+
+        if (movementInput == Vector3.zero) return; 
+
+
+        if (camScript != null && camScript.isAiming)
+        {
+            /*// Face same direction as camera
+            Vector3 camForward = cameraTransform.forward;
+            if (camForward != Vector3.zero)
             {
-                // Face same direction as camera
-                Vector3 camFlatForward = camForward.normalized;
-                if (camFlatForward != Vector3.zero)
-                {
-                    Quaternion targetRotation = Quaternion.LookRotation(camFlatForward);
-                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 15f * Time.deltaTime);
-                }
-            }
-            else
-            {
-                // Rotate toward movement direction
-                Quaternion targetRotation = Quaternion.LookRotation(movementInput);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
-            }
+                Quaternion targetRotation = Quaternion.LookRotation(camForward);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 15f * Time.deltaTime);
+            }*/
         }
         else
         {
-            movementInput = Vector3.zero;
-        }
-
-        // Fire on left click
-        if (camScript != null && camScript.isAiming && Input.GetMouseButtonDown(0))
-        {
-            FireFromMouse();
-        } 
-    }
-
-    void FireFromMouse()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
-        {
-            Debug.DrawLine(ray.origin, hit.point, Color.red, 2f);
-            Debug.Log("Hit object: " + hit.collider.name);
-
-            EnemyHealth enemy = hit.collider.GetComponent<EnemyHealth>();
-            if (enemy != null)
-            {
-                enemy.TakeDamage(damage, hit.point);
-            }
+            // Rotate toward movement direction
+            Quaternion targetRotation = Quaternion.LookRotation(movementInput);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
         }
     }
 
     void FixedUpdate()
     {
-        Vector3 targetPos; 
-        
-
-        if (camScript.isAiming)
-        {
-            targetPos = rb.position + movementInput * aimMoveSpeed * Time.fixedDeltaTime;  
-        }
-
-        else
-        {
-            targetPos = rb.position + movementInput * moveSpeed * Time.fixedDeltaTime;
-        }
-
+        float speed = (camScript != null && camScript.isAiming) ? aimMoveSpeed : moveSpeed;
+        Vector3 targetPos = rb.position + movementInput * speed * Time.fixedDeltaTime;
         rb.MovePosition(targetPos);
     }
 }
