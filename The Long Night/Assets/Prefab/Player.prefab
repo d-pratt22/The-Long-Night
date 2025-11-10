@@ -47,6 +47,7 @@ GameObject:
   - component: {fileID: 7712005244313562326}
   - component: {fileID: 4830350614572885931}
   - component: {fileID: -7916496949352661597}
+  - component: {fileID: 4009841862451009139}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -204,6 +205,20 @@ MonoBehaviour:
   equippedWeapon: {fileID: 0}
   weaponHolder: {fileID: 0}
   weaponVisuals: []
+--- !u!114 &4009841862451009139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9051389584974787177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 256e941c05c7f794a90cfedbe678f84f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  infectionLevel: 0
 --- !u!1 &9169420409077652676
 GameObject:
   m_ObjectHideFlags: 0

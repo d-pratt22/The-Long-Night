@@ -4,6 +4,7 @@ public class InventoryItemController : MonoBehaviour
 {
     public ItemAsset item;
     public PlayerShooting playerShooting;
+    public PlayerHealth playerHealth;
 
     private void Awake()
     {
@@ -11,7 +12,10 @@ public class InventoryItemController : MonoBehaviour
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null)
+            {
                 playerShooting = player.GetComponent<PlayerShooting>();
+                playerHealth = player.GetComponent<PlayerHealth>(); 
+            }
         }
     }
 
@@ -34,6 +38,10 @@ public class InventoryItemController : MonoBehaviour
             case ItemAsset.ItemType.Weapon:
                 EquipWeapon();
                 break;
+            case ItemAsset.ItemType.Healing:
+                HealingItem();
+                RemoveItem();
+                break;
         }
 
         //Maybe: RemoveItem();
@@ -46,6 +54,14 @@ public class InventoryItemController : MonoBehaviour
         if (item is WeaponItem weapon)
         {
             playerShooting.EquipWeapon(weapon);
+        }
+    }
+
+    private void HealingItem()
+    {
+        if (item is  HealingItem healing)
+        {
+            playerHealth.UseHealingItem(healing);
         }
     }
 }

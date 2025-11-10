@@ -11,6 +11,7 @@ public class ItemAsset : ScriptableObject
 
     public enum ItemType
     {
-        Weapon
+        Weapon,
+        Healing
     }
 }
