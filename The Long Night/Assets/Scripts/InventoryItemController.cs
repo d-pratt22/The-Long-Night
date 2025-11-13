@@ -33,6 +33,11 @@ public class InventoryItemController : MonoBehaviour
 
     public void UseItem()
     {
+        if (playerShooting == null || playerHealth == null)
+        {
+            Awake();
+        }
+
         switch (item.itemType)
         {
             case ItemAsset.ItemType.Weapon:
@@ -43,7 +48,6 @@ public class InventoryItemController : MonoBehaviour
                 RemoveItem();
                 break;
         }
-
         //Maybe: RemoveItem();
     }
 
