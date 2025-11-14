@@ -38,26 +38,21 @@ public class InventoryManager : MonoBehaviour
             Destroy(item.gameObject);
         }
 
-        foreach (var item in Items)
-        {
-            GameObject obj = Instantiate(InventoryItem, ItemContent);
-            var itemName = obj.transform.Find("itemName").GetComponent<TMP_Text>();
-            var itemSprite = obj.transform.Find("itemImage").GetComponent<Image>();
-
-            itemName.text = item.itemName;
-            itemSprite.sprite = item.itemSprite;
-        }
-
-        SetInventoryItems();
-    }
-
-    public void SetInventoryItems()
-    {
-        inventoryItems = ItemContent.GetComponentsInChildren<InventoryItemController>();
+        inventoryItems = new InventoryItemController[Items.Count];
 
         for (int i = 0; i < Items.Count; i++)
         {
-            inventoryItems[i].AddItem(Items[i]);
+            GameObject obj = Instantiate(InventoryItem, ItemContent);
+            var itemController = obj.GetComponent<InventoryItemController>();
+
+            itemController.AddItem(Items[i]);
+            inventoryItems[i] = itemController;
+
+            var itemName = obj.transform.Find("itemName").GetComponent<TMP_Text>();
+            var itemSprite = obj.transform.Find("itemImage").GetComponent<Image>();
+
+            itemName.text = Items[i].itemName;
+            itemSprite.sprite = Items[i].itemSprite;
         }
     }
 }

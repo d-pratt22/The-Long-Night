@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerShooting : MonoBehaviour
@@ -10,8 +11,13 @@ public class PlayerShooting : MonoBehaviour
     private bool canShoot = true;
     private int bulletCount = 0;
 
+    public TextMeshProUGUI bulletText;
+    public GameObject reloadingText;
+
     public Transform weaponHolder;
     public List<WeaponVisual> weaponVisuals = new List<WeaponVisual>();
+
+
 
     private void Start()
     {
@@ -31,6 +37,8 @@ public class PlayerShooting : MonoBehaviour
         {
             bulletCount = equippedWeapon.bulletCount;
         }
+
+        bulletText.text = bulletCount + "/" + bulletCount;
 
         foreach (var visual in weaponVisuals)
         {
@@ -68,6 +76,8 @@ public class PlayerShooting : MonoBehaviour
             return;
 
         bulletCount--;
+
+        bulletText.text = bulletCount + "/" + equippedWeapon.bulletCount;
 
 
         WeaponVisual currentVisual = weaponVisuals.Find(v =>
@@ -112,8 +122,11 @@ public class PlayerShooting : MonoBehaviour
 
     IEnumerator Reload()
     {
+        reloadingText.SetActive(true);
         yield return new WaitForSeconds(equippedWeapon.reloadSpeed);
         bulletCount = equippedWeapon.bulletCount;
+        bulletText.text = bulletCount + "/" + bulletCount;
+        reloadingText.SetActive(false);
     }
 }
 

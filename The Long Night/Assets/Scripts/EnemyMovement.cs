@@ -6,13 +6,27 @@ public class EnemyMovement : MonoBehaviour
     public Transform playerPos;
     NavMeshAgent agent;
 
+    private bool isInRadius = false;
+
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
     }
 
+    public void SetPlayerInRadius(bool value)
+    {
+        isInRadius = value;
+    }
+
     private void Update()
     {
-        agent.destination = playerPos.position;
+        if (isInRadius)
+        {
+            agent.destination = playerPos.position;
+        }
+        else
+        {
+            agent.destination = transform.position; 
+        }
     }
 }

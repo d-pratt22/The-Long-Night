@@ -15,6 +15,8 @@ public class UIManager : MonoBehaviour
 
     public UnityEngine.UI.Button switchMenuButton;
 
+    public GameObject interactText;
+
     public float menuWaitTime = 1f;
 
     private bool menuEnabled = false;
@@ -25,6 +27,8 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         menu.SetActive(false);
+
+        interactText.SetActive(false);
 
         switchMenuButton.onClick.AddListener(SwitchMenu);
     }
@@ -62,6 +66,11 @@ public class UIManager : MonoBehaviour
         }
         inventory.SetActive(inventoryEnabled);
         StartCoroutine(MenuWait());
+    }
+
+    public void ToggleInteractButton(bool interactOn)
+    {
+        interactText.SetActive(interactOn);
     }
 
     IEnumerator MenuWait()

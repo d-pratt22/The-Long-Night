@@ -23,7 +23,7 @@ public class InventoryItemController : MonoBehaviour
     {
         InventoryManager.Instance.Remove(item);
 
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
     public void AddItem(ItemAsset newItem)
@@ -33,6 +33,12 @@ public class InventoryItemController : MonoBehaviour
 
     public void UseItem()
     {
+        if (item == null)
+        {
+            Debug.LogError("Item is null! Make sure to call AddItem() before UseItem.");
+            return;
+        }
+
         if (playerShooting == null || playerHealth == null)
         {
             Awake();
